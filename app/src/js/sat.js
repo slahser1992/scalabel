@@ -676,6 +676,7 @@ SatItem.prototype.deleteInvalidLabels = function() {
   self.labels = valid;
 };
 
+// @flow
 /**
  * Base class for all the labeled objects. New label should be instantiated by
  * Sat.newLabel()
@@ -692,7 +693,7 @@ SatItem.prototype.deleteInvalidLabels = function() {
  * @param {number | null} id: label object identifier
  * @param {object} ignored: ignored parameter for optional attributes.
  */
-export function SatLabel(sat, id = -1, ignored = null) {
+export function SatLabel(sat: Sat, id: number = -1, ignored: any = null) {
   this.id = id;
   this.categoryPath = null;
   this.attributes = {};
