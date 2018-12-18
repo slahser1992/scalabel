@@ -377,6 +377,9 @@ Sat.prototype.initToolbox = function() {
           self.attributes[i].toolType + '"';
     }
   }
+  document.getElementById('check-btn').onclick = function() {
+    self.check();
+  };
   document.getElementById('save-btn').onclick = function() {
     self.save();
   };
@@ -387,6 +390,20 @@ Sat.prototype.initToolbox = function() {
       self.save();
     }
   };
+};
+
+/**
+ * Check this labeling by sending JSON to the back end.
+ */
+Sat.prototype.check = function() {
+  let self = this;
+  let json = self.toJson();
+  let projectName = json.task.projectOptions.name;
+  let taskIndex = String(json.task.index);
+  let pageIndex = document.getElementById('page-count').innerHTML;
+  let xhr = new XMLHttpRequest();
+  xhr.open('POST', './postCheck');
+  xhr.send(JSON.stringify({projectName, taskIndex, pageIndex}));
 };
 
 /**

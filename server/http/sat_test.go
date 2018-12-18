@@ -177,6 +177,21 @@ func TestLoadAssignment(t *testing.T) {
 	}
 }
 
+func TestCheckHandler(t *testing.T) {
+    for i := 0; i < 10; i += 1 {
+        req, err := http.NewRequest("POST", "postSave",
+            bytes.NewBuffer([]byte(fmt.Sprintf(`{"task": {"projectOptions": {"name": "%s"}, "index":%d}, "labels": [{"id": 0, "categoryPath": "test"}, {"id": 1, "categoryPath": "test"}]}`, ProjectName, i))))
+        if err != nil {
+            t.Fatal(err)
+        }
+        rr := httptest.NewRecorder()
+        postSaveHandler(rr, req)
+        if rr.Code != 200 {
+            t.Fatal(errors.New(fmt.Sprintf("Save assignment handler HTTP code: %d", rr.Code)))
+        }
+    }
+}
+
 func TestSaveHandler(t *testing.T) {
 	for i := 0; i < 10; i += 1 {
 		req, err := http.NewRequest("POST", "postSave",

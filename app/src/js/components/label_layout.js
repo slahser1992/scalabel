@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {AppBar, CssBaseline, Toolbar, Typography, withStyles, IconButton,
-  MenuIcon, Tooltip} from '@material-ui/core';
+import {AppBar, CssBaseline, Toolbar, Typography, withStyles, IconButton, Tooltip} from '@material-ui/core';
 import SplitPane from 'react-split-pane';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faInfo, faQuestion, faSave, faCheck} from
@@ -37,7 +36,6 @@ function LabelLayout(props) {
           <Toolbar variant="dense">
             <IconButton className={classes.menuButton}
                         color="inherit" aria-label="Menu">
-              <MenuIcon />
             </IconButton>
             <Typography variant="h6" color="inherit">
               BDD Labeling Session

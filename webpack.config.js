@@ -18,6 +18,14 @@ let config = {
     filename: '[name].js',
     path: __dirname + '/app/dist/js/',
   },
+  devServer: {
+    contentBase: __dirname + '/app',
+    compress: true,
+    port: 8000,
+    disableHostCheck: false,
+    host: '0.0.0.0',
+    hot: true,
+  },
   plugins: [
     new webpack.ProvidePlugin({
       '$': 'jquery',
