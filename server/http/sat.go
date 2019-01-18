@@ -143,6 +143,8 @@ type Item struct {
 	Data        map[string]interface{} `json:"data" yaml:"data"`
 	LabelImport []LabelExport          `json:"labelImport" yaml:"labelImport"`
 	Attributes  map[string][]int       `json:"attributes" yaml:"attributes"`
+	VideoName   string                 `json:"videoName" yaml:"videoName"`
+	Timestamp   int64                  `json:"timestamp" yaml:"timestamp"`
 }
 
 // An annotation for an item, needs to include all possible annotation types
@@ -239,6 +241,18 @@ func countCategories(categories []Category) int {
 		}
 	}
 	return count
+}
+
+func createHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles(env.CreatePath())
+	if err != nil {
+		Error.Println(err)
+		http.NotFound(w, r)
+		return
+	}
+
+	existingProjects := GetExistingProjects()
+	tmpl.Execute(w, existingProjects)
 }
 
 func dashboardHandler(w http.ResponseWriter, r *http.Request) {
@@ -499,7 +513,7 @@ func postCheckHandler(w http.ResponseWriter, r *http.Request) {
 	var cp CheckParam
 	err = json.Unmarshal(body, &cp)
 
-    fmt.Printf("taskIndex: %s\n", cp.TaskIndex)
+  	fmt.Printf("taskIndex: %s\n", cp.TaskIndex)
 	fmt.Printf("pageIndex: %s\n", cp.PageIndex)
 	fmt.Printf("projectName: %s\n", cp.ProjectName)
 
@@ -507,19 +521,20 @@ func postCheckHandler(w http.ResponseWriter, r *http.Request) {
 		Error.Println(err)
 	}
 
-    cmd := exec.Command("python3", "./scripts/visualization.py", cp.TaskIndex, cp.PageIndex, "created_by_zou_1212PM")
-    var out bytes.Buffer
-    cmd.Stdout = &out
-    tb := time.Now()
-    fmt.Printf("%s\n", tb)
-    err = cmd.Run()
-    ta := time.Now()
-    fmt.Printf("%s\n", ta)
-    if err != nil {
-        log.Fatal("Run: ", err)
-    }
-
-    w.Write(nil)
+  cmd := exec.Command("python3", "./scripts/visualization.py", cp.TaskIndex, cp.PageIndex, "test")
+  var out bytes.Buffer
+  cmd.Stdout = &out
+  tb := time.Now()
+  fmt.Printf("%s\n", tb)
+  err = cmd.Run()
+  ta := time.Now()
+  fmt.Printf("%s\n", ta)
+  if err != nil {
+    log.Fatal("Run: ", err)
+	w.Write([]byte("Create mask fail."))
+  } else {
+	w.Write([]byte("Mask has been craeted."))
+  }
 }
 
 // Handles the posting of saved assignments
@@ -578,9 +593,13 @@ func postExportHandler(w http.ResponseWriter, r *http.Request) {
 				item := ItemExport{}
 				item.Index = itemToLoad.Index
 				if projectToLoad.Options.ItemType == "video" {
-					item.VideoName = projectToLoad.Options.Name + "_" + Index2str(task.Index)
+					item.VideoName = itemToLoad.VideoName
+				} else {
+					//TODO: ask about what to do here
+					item.VideoName = itemToLoad.VideoName
+					//item.VideoName = projectToLoad.Options.Name + "_" + Index2str(task.Index)
 				}
-				item.Timestamp = 10000 // to be fixed
+				item.Timestamp = itemToLoad.Timestamp
 				item.Name = itemToLoad.Url
 				item.Url = itemToLoad.Url
 				for _, labelId := range itemToLoad.LabelIds {
@@ -623,9 +642,12 @@ func postExportHandler(w http.ResponseWriter, r *http.Request) {
 				item := ItemExport{}
 				item.Index = itemToLoad.Index
 				if projectToLoad.Options.ItemType == "video" {
-					item.VideoName = projectToLoad.Options.Name + "_" + Index2str(task.Index)
+					item.VideoName = itemToLoad.VideoName
+				} else {
+					//TODO: ask about what to do here
+					item.VideoName = itemToLoad.VideoName
 				}
-				item.Timestamp = 10000 // to be fixed
+				item.Timestamp = itemToLoad.Timestamp
 				item.Name = itemToLoad.Url
 				item.Url = itemToLoad.Url
 				items = append(items, item)
@@ -793,6 +815,8 @@ func getItemsFromProjectForm(r *http.Request, attributes []Attribute) map[string
 			item := Item{}
 			item.Url = itemImport.Url
 			item.Index = indexes[itemImport.VideoName]
+			item.VideoName = itemImport.VideoName
+			item.Timestamp = itemImport.Timestamp
 			// load item attributes if needed
 			if len(itemImport.Attributes) > 0 {
 				item.Attributes = map[string][]int{}

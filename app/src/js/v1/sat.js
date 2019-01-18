@@ -3,6 +3,7 @@ import $ from 'jquery';
 import 'bootstrap-switch';
 import {makeState} from '../functional/states';
 import {Shape} from './shape';
+import * as PIXI from 'pixi.js';
 
 // constants
 const COLOR_PALETTE = [
@@ -82,6 +83,58 @@ export function Sat(ItemType, LabelType, hasNetwork=true) {
   self.taskId = null;
   self.projectName = null;
   self.ready = false;
+  self.rectDiv = document.getElementById('div-canvas').getBoundingClientRect();
+  self.map_id = {
+    'Void': 0,
+    'Sky': 1,
+    'Vegetation': 2,
+    'Building': 3,
+    'Sidewalk': 4,
+    'Obstacles on sidewalk': 5,
+    'Pole': 6,
+    'Road': 7,
+    'Curb Stone': 8,
+    'Lane Divider / Traffic Cone': 9,
+    'Lane': 10,
+    'Traffic Sign': 11,
+    'Traffic Light': 12,
+    'other Obstacles on road': 13,
+    'Truck': 14,
+    'Bus': 15,
+    'Car': 16,
+    'Tricycle': 17,
+    'Bicycle / Motor': 18,
+    'Person': 19,
+  };
+  self.label_colors = [
+    0x000000,
+    0x4581B4,
+    0x6A8E23,
+    0x454545,
+    0xD723D7,
+    0x641E1E,
+    0x999999,
+    0x804080,
+    0x66669C,
+    0xBE9999,
+    0x808080,
+    0xDBDB00,
+    0xFAAA1D,
+    0x003C64,
+    0x000045,
+    0x003C64,
+    0x00008E,
+    0x0000E6,
+    0x770A20,
+    0xDB133C,
+  ];
+  self.mask = new PIXI.Application({
+    backgroundColor: 0xFFFFCC,
+    view: document.getElementById('image-mask'),
+    antialias: true,
+    width: 1920, // original image width
+    height: 1200, // original image height
+  });
   if (self.slider) {
     self.numFrames = self.slider.max;
     self.slider.oninput = function() {
@@ -378,7 +431,50 @@ Sat.prototype.initToolbox = function() {
     }
   }
   document.getElementById('check-btn').onclick = function() {
-    self.check();
+    if (document.getElementById('image-mask').style.display === 'block') {
+      self.mask.stage.removeChildren(0);
+      $('#image-mask').hide();
+    } else {
+      const graphics = new PIXI.Graphics();
+      const json = self.toJson();
+      const labelIds = json.task.items[self.currentItem.index].labelIds;
+      self.currentFrameLabels = [];
+      for (let labelId in self.labelIdMap) {
+        if (labelIds.indexOf(Number(labelId)) !== -1) {
+          self.currentFrameLabels.push(self.labelIdMap[labelId]);
+        }
+      }
+      for (let category in self.map_id) {
+        if (typeof category === 'string' &&
+          self.currentFrameLabels &&
+          self.currentFrameLabels.length > 0
+        ) {
+          for (let i in self.currentFrameLabels) {
+            if (self.currentFrameLabels[i]) {
+              const label = self.currentFrameLabels[i];
+              if (label.categoryPath === category) {
+                graphics.beginFill(
+                  self.label_colors[self.map_id[category]]);
+                graphics.lineStyle(
+                  1, self.label_colors[self.map_id[category]]);
+                for (let j = 0; j < label.polys.length; j++) {
+                  const points = [];
+                  const vertices = label.polys[j].vertices;
+                  for (let k = 0; k < vertices.length; k++) {
+                    points.push(
+                      new PIXI.Point(vertices[k]._x, vertices[k]._y));
+                  }
+                  graphics.drawPolygon(points);
+                  graphics.endFill();
+                  self.mask.stage.addChild(graphics);
+                }
+              }
+            }
+          }
+        }
+      }
+      $('#image-mask').show();
+    }
   };
   document.getElementById('save-btn').onclick = function() {
     self.save();
@@ -390,20 +486,6 @@ Sat.prototype.initToolbox = function() {
       self.save();
     }
   };
-};
-
-/**
- * Check this labeling by sending JSON to the back end.
- */
-Sat.prototype.check = function() {
-  let self = this;
-  let json = self.toJson();
-  let projectName = json.task.projectOptions.name;
-  let taskIndex = String(json.task.index);
-  let pageIndex = document.getElementById('page-count').innerHTML;
-  let xhr = new XMLHttpRequest();
-  xhr.open('POST', './postCheck');
-  xhr.send(JSON.stringify({projectName, taskIndex, pageIndex}));
 };
 
 /**
@@ -639,7 +721,8 @@ SatItem.prototype.toJson = function() {
     }
   }
   return {url: self.url, index: self.index,
-    labelIds: labelIds, labelImport: null};
+    labelIds: labelIds, labelImport: null,
+    name: self.name, videoName: self.videoName, timestamp: self.timestamp};
 };
 
 /**
@@ -654,6 +737,9 @@ SatItem.prototype.fromJson = function(json) {
   let self = this;
   self.url = json.url;
   self.index = json.index;
+  self.name = json.name;
+  self.videoName = json.videoName;
+  self.timestamp = json.timestamp;
   if (json.labelIds) {
     for (let i = 0; i < json.labelIds.length; i++) {
       let label = self.sat.labelIdMap[json.labelIds[i]];

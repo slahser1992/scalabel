@@ -1,1 +1,19 @@
+- name: Road
 - name: Lane
+- name: Sidewalk
+- name: Curb Stone
+- name: Lane Divider / Traffic Cone
+- name: Car
+- name: Bus
+- name: Truck
+- name: Person
+- name: Bicycle / Motor
+- name: Tricycle
+- name: other Obstacles on road
+- name: Traffic Sign
+- name: Traffic Light
+- name: Building
+- name: Pole
+- name: Vegetation
+- name: Obstacles on sidewalk
+- name: Sky

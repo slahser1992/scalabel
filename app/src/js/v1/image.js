@@ -84,6 +84,7 @@ export function SatImage(sat, index, url) {
   self.image.src = self.url;
 
   self.divCanvas = document.getElementById('div-canvas');
+  self.maskCanvas = document.getElementById('image-mask');
   self.imageCanvas = document.getElementById('image-canvas');
   self.labelCanvas = document.getElementById('label-canvas');
   self.hiddenCanvas = document.getElementById('hidden-canvas');
@@ -96,6 +97,8 @@ export function SatImage(sat, index, url) {
   self.MAX_SCALE = 3.0;
   self.MIN_SCALE = 1.0;
   self.SCALE_RATIO = 1.05;
+  self.ORIGINAL_IMAGE_WIDTH = 1920;
+  self.ORIGINAL_IMAGE_HEIGHT = 1200;
   self.scrollTimer = null;
 
   self.isMouseDown = false;
@@ -313,8 +316,10 @@ SatImage.prototype.setScale = function(scale, mouseOffset = null) {
 
   // set canvas resolution
   self.imageCanvas.height = canvasHeight;
+  self.maskCanvas.height = self.ORIGINAL_IMAGE_HEIGHT;
   self.hiddenCanvas.height = canvasHeight * UP_RES_RATIO;
   self.labelCanvas.height = canvasHeight * UP_RES_RATIO;
+  self.maskCanvas.width = self.ORIGINAL_IMAGE_WIDTH;
   self.imageCanvas.width = canvasWidth;
   self.hiddenCanvas.width = canvasWidth * UP_RES_RATIO;
   self.labelCanvas.width = canvasWidth * UP_RES_RATIO;
@@ -322,6 +327,8 @@ SatImage.prototype.setScale = function(scale, mouseOffset = null) {
   // set canvas size
   self.imageCanvas.style.height = canvasHeight + 'px';
   self.imageCanvas.style.width = canvasWidth + 'px';
+  self.maskCanvas.style.height = canvasHeight + 'px';
+  self.maskCanvas.style.width = canvasWidth + 'px';
   self.labelCanvas.style.height = canvasHeight + 'px';
   self.labelCanvas.style.width = canvasWidth + 'px';
   self.hiddenCanvas.style.height = canvasHeight + 'px';
@@ -331,7 +338,8 @@ SatImage.prototype.setScale = function(scale, mouseOffset = null) {
   self.padding = self._getPadding();
   let padX = self.padding.x;
   let padY = self.padding.y;
-
+  self.maskCanvas.style.left = padX + 'px';
+  self.maskCanvas.style.top = padY + 'px';
   self.imageCanvas.style.left = padX + 'px';
   self.imageCanvas.style.top = padY + 'px';
   self.labelCanvas.style.left = padX + 'px';

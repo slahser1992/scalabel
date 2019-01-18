@@ -176,6 +176,12 @@ canvas#label-canvas {
     z-index: 4;
 }
 
+canvas#image-mask {
+    z-index: 5;
+    display: none;
+    background: #00C851;
+}
+
 canvas#hidden-canvas {
     z-index: 1;
     image-rendering: optimizeSpeed;             /* Older versions of FF          */

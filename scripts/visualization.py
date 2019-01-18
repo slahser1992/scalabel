@@ -73,11 +73,16 @@ project_name = sys.argv[3]
 
 print(task, item, project_name)
 
-d = requests.get('http://192.168.3.101:8686/postExport?project_name='+project_name).json()
+d = requests.get('http://localhost:8686/postExport?project_name=dff3').json()
 
 i = get_idx(task, item)
 img, mask = get_mask(d[i])
 mask_show = show(img, mask)
-imsave('mask.jpg', mask_show)
+
+
+save_path = 'app/dist/static/'
+
+imsave(save_path + 'mask.jpg', mask_show)
 mask[mask==0]=255
-imsave('unlabeld_area.jpg', mask)
+imsave(save_path + 'unlabeld_area.jpg', mask)
+print("end")

@@ -146,6 +146,7 @@ func main() {
 	//http.HandleFunc("/", parse(indexHandler))
 	http.HandleFunc("/", WrapHandler(http.FileServer(
 		http.Dir(path.Join(env.SrcPath, env.AppSubDir)))))
+
 	http.HandleFunc("/dashboard", WrapHandleFunc(dashboardHandler))
 	http.HandleFunc("/vendor", WrapHandleFunc(vendorHandler))
 	http.HandleFunc("/postProject", WrapHandleFunc(postProjectHandler))
@@ -162,8 +163,8 @@ func main() {
 		WrapHandleFunc(postLoadAssignmentV2Handler))
 
 	// Simple static handlers can be generated with MakePathHandleFunc
-	http.HandleFunc("/create",
-		WrapHandleFunc(MakePathHandleFunc(env.CreatePath())))
+	// http.HandleFunc("/create", WrapHandleFunc(MakePathHandleFunc(env.CreatePath())))
+	http.HandleFunc("/create", WrapHandleFunc(createHandler))
 	http.HandleFunc("/label2d", WrapHandleFunc(Label2dHandler))
 	http.HandleFunc("/label2dv2", WrapHandleFunc(Label2dv2Handler))
 	http.HandleFunc("/label3d", WrapHandleFunc(Label3dHandler))
