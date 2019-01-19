@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os/exec"
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v2"
 	"html/template"
@@ -18,7 +17,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"time"
 )
 
 //implements Serializable
@@ -496,45 +494,6 @@ func postLoadAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 		Error.Println(err)
 	}
 	w.Write(loadedAssignmentJson)
-}
-
-
-//Handles the posting of checked view
-func postCheckHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.NotFound(w, r)
-		return
-	}
-	body, err := ioutil.ReadAll(r.Body)
-
-	if err != nil {
-		Error.Println(err)
-	}
-	var cp CheckParam
-	err = json.Unmarshal(body, &cp)
-
-  	fmt.Printf("taskIndex: %s\n", cp.TaskIndex)
-	fmt.Printf("pageIndex: %s\n", cp.PageIndex)
-	fmt.Printf("projectName: %s\n", cp.ProjectName)
-
-	if err != nil {
-		Error.Println(err)
-	}
-
-  cmd := exec.Command("python3", "./scripts/visualization.py", cp.TaskIndex, cp.PageIndex, "test")
-  var out bytes.Buffer
-  cmd.Stdout = &out
-  tb := time.Now()
-  fmt.Printf("%s\n", tb)
-  err = cmd.Run()
-  ta := time.Now()
-  fmt.Printf("%s\n", ta)
-  if err != nil {
-    log.Fatal("Run: ", err)
-	w.Write([]byte("Create mask fail."))
-  } else {
-	w.Write([]byte("Mask has been craeted."))
-  }
 }
 
 // Handles the posting of saved assignments

@@ -152,7 +152,6 @@ func main() {
 	http.HandleFunc("/postProject", WrapHandleFunc(postProjectHandler))
 	//http.HandleFunc("/postSatProject", WrapHandleFunc(postSatProjectHandler))
 	http.HandleFunc("/postSave", WrapHandleFunc(postSaveHandler))
-	http.HandleFunc("/postCheck", WrapHandleFunc(postCheckHandler))
 	http.HandleFunc("/postSaveV2", WrapHandleFunc(postSaveV2Handler))
 	http.HandleFunc("/postExport", WrapHandleFunc(postExportHandler))
 	http.HandleFunc("/postExportV2", WrapHandleFunc(postExportV2Handler))

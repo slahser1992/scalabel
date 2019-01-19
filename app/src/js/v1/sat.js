@@ -434,6 +434,7 @@ Sat.prototype.initToolbox = function() {
     if (document.getElementById('image-mask').style.display === 'block') {
       self.mask.stage.removeChildren(0);
       $('#image-mask').hide();
+      $('#label-canvas').show();
     } else {
       const graphics = new PIXI.Graphics();
       const json = self.toJson();
@@ -474,6 +475,7 @@ Sat.prototype.initToolbox = function() {
         }
       }
       $('#image-mask').show();
+      $('#label-canvas').hide();
     }
   };
   document.getElementById('save-btn').onclick = function() {

@@ -179,6 +179,7 @@ canvas#label-canvas {
 canvas#image-mask {
     z-index: 5;
     display: none;
+    opacity: .5;
     background: #00C851;
 }
 
