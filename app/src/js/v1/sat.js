@@ -554,7 +554,7 @@ Sat.prototype.encodeBaseJson = function() {
     },
     workerId: self.workerId,
     labels: labels,
-    events: self.events,
+    events: self.events[self.events.length - 1],
     startTime: self.startTime,
     numLabeledItems: labeledItemsCount,
     userAgent: navigator.userAgent,

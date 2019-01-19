@@ -73,13 +73,26 @@ func (fs *FileStorage) ListKeys(prefix string) []string {
 
 func (fs *FileStorage) Save(key string, fields map[string]interface{}) error {
 	os.MkdirAll(path.Join(fs.DataDir, filepath.Dir(key)), 0777)
-	path := path.Join(fs.DataDir, key+".json")
-	Info.Println(path)
+	fPath := path.Join(fs.DataDir, key+".json")
+
+	dir := path.Join(fs.DataDir, filepath.Dir(key + ".json"))
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		err := os.Remove(path.Join(fs.DataDir, filepath.Dir(key), file.Name()))
+		if err != nil {
+			return err
+		}
+	}
+
 	json, err := json.MarshalIndent(fields, "", "  ")
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(path, json, 0644)
+	err = ioutil.WriteFile(fPath, json, 0644)
 	if err != nil {
 		return err
 	} else {
