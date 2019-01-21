@@ -836,6 +836,8 @@ SatImage.prototype._keydown = function(e) {
           this.labels[index - 1] = this.selectedLabel;
         }
       }
+    } else if (keyID === 67) {
+      document.getElementById('check-btn').click();
     } else if (keyID === 187) {
       this._incHandler();
       return;
