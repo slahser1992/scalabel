@@ -586,6 +586,12 @@ SatImage.prototype._prevHandler = function() {
     }
     self.selectedLabel.deactivate();
   }
+  if (document.getElementById('image-mask').style.display === 'block') {
+    self.sat.mask.stage.removeChildren(0);
+    setTimeout(function() {
+      self.sat.generateMask();
+    }, 0);
+  }
   self.sat.gotoItem(self.index - 1);
 };
 
@@ -599,6 +605,12 @@ SatImage.prototype._nextHandler = function() {
       return;
     }
     self.selectedLabel.deactivate();
+  }
+  if (document.getElementById('image-mask').style.display === 'block') {
+    self.sat.mask.stage.removeChildren(0);
+    setTimeout(function() {
+      self.sat.generateMask();
+    }, 0);
   }
   self.sat.gotoItem(self.index + 1);
 };
