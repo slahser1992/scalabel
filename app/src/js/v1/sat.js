@@ -396,6 +396,48 @@ Sat.prototype.appendCascadeCategories = function(
       level + 1); // recursively add new levels
 };
 
+Sat.prototype.generateMask = function() {
+  let self = this;
+  const graphics = new PIXI.Graphics();
+  const json = self.toJson();
+  const labelIds = json.task.items[self.currentItem.index].labelIds;
+  self.currentFrameLabels = [];
+  for (let labelId in self.labelIdMap) {
+    if (labelIds.indexOf(Number(labelId)) !== -1) {
+      self.currentFrameLabels.push(self.labelIdMap[labelId]);
+    }
+  }
+  for (let category in self.map_id) {
+    if (typeof category === 'string' &&
+      self.currentFrameLabels &&
+      self.currentFrameLabels.length > 0
+    ) {
+      for (let i in self.currentFrameLabels) {
+        if (self.currentFrameLabels[i]) {
+          const label = self.currentFrameLabels[i];
+          if (label.categoryPath === category) {
+            graphics.beginFill(
+              self.label_colors[self.map_id[category]]);
+            graphics.lineStyle(
+              1, self.label_colors[self.map_id[category]]);
+            for (let j = 0; j < label.polys.length; j++) {
+              const points = [];
+              const vertices = label.polys[j].vertices;
+              for (let k = 0; k < vertices.length; k++) {
+                points.push(
+                  new PIXI.Point(vertices[k]._x, vertices[k]._y));
+              }
+              graphics.drawPolygon(points);
+              graphics.endFill();
+              self.mask.stage.addChild(graphics);
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
 Sat.prototype.initToolbox = function() {
   let self = this;
   // initialize all categories
@@ -436,44 +478,7 @@ Sat.prototype.initToolbox = function() {
       $('#image-mask').hide();
       $('#label-canvas').show();
     } else {
-      const graphics = new PIXI.Graphics();
-      const json = self.toJson();
-      const labelIds = json.task.items[self.currentItem.index].labelIds;
-      self.currentFrameLabels = [];
-      for (let labelId in self.labelIdMap) {
-        if (labelIds.indexOf(Number(labelId)) !== -1) {
-          self.currentFrameLabels.push(self.labelIdMap[labelId]);
-        }
-      }
-      for (let category in self.map_id) {
-        if (typeof category === 'string' &&
-          self.currentFrameLabels &&
-          self.currentFrameLabels.length > 0
-        ) {
-          for (let i in self.currentFrameLabels) {
-            if (self.currentFrameLabels[i]) {
-              const label = self.currentFrameLabels[i];
-              if (label.categoryPath === category) {
-                graphics.beginFill(
-                  self.label_colors[self.map_id[category]]);
-                graphics.lineStyle(
-                  1, self.label_colors[self.map_id[category]]);
-                for (let j = 0; j < label.polys.length; j++) {
-                  const points = [];
-                  const vertices = label.polys[j].vertices;
-                  for (let k = 0; k < vertices.length; k++) {
-                    points.push(
-                      new PIXI.Point(vertices[k]._x, vertices[k]._y));
-                  }
-                  graphics.drawPolygon(points);
-                  graphics.endFill();
-                  self.mask.stage.addChild(graphics);
-                }
-              }
-            }
-          }
-        }
-      }
+      self.generateMask();
       $('#image-mask').show();
       $('#label-canvas').hide();
     }
